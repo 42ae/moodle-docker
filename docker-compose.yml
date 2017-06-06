@@ -1,0 +1,52 @@
+version: '3'
+services:
+  db:
+    image: mysql
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: moodle
+      MYSQL_USER: moodle
+      MYSQL_PASSWORD: password
+    restart: always
+  moodle:
+    image: aesr/moodle
+    ports:
+      - "8080:80"
+    links:
+      - db:database
+    volumes:
+      - ./moodledata:/var/www/moodledata
+      - ./moodle:/var/www/html
+    restart: always
+    environment:
+      MOODLE_DB_HOST: database
+      MOODLE_DB_PORT: 3306
+      MOODLE_DB_NAME: moodle
+      MOODLE_DB_USER: moodle
+      MOODLE_DB_PASSWORD: password
+      MOODLE_WWW_ROOT: ${MOODLE_WWW_ROOT:-http://localhost:8080}
+      MOODLE_DATA_ROOT: /var/www/moodledata
+    labels:
+      cron.moodle.command: "/usr/local/bin/php /var/www/html/admin/cli/cron.php"
+      cron.moodle.interval: "every minute"
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8081:80"
+    links:
+      - db:database
+    environment:
+      PMA_HOST: database
+  tasks:
+    image: funkyfuture/deck-chores
+    restart: unless-stopped
+    environment:
+      TIMEZONE: Europe/Paris
+      LABEL_NAMESPACE: cron
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+volumes:
+    db_data:
+      driver: local
