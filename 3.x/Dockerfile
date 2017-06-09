@@ -51,7 +51,7 @@ ENV MOODLE_SHA1 cd740701f5f01bb1469a0f96307739fee5b28863
 RUN set -ex; \
   curl -o moodle.tgz -fSL "https://download.moodle.org/stable${MOODLE_BRANCH}/moodle-${MOODLE_RELEASE}.tgz"; \
   echo "$MOODLE_SHA1 moodle.tgz" | sha1sum -c -; \
-# upstream tarballs include ./moodle/ so this gives us /usr/src/wordpress
+# upstream tarballs include ./moodle/ so this gives us /usr/src/moodle
   tar -xzf moodle.tgz -C /usr/src/; \
   rm moodle.tgz; \
   chown -R www-data:www-data /usr/src/moodle
