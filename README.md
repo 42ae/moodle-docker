@@ -1,7 +1,13 @@
-# Supported tags and respective `Dockerfile` links
+[![Deploy to Docker Cloud](https://files.cloud.docker.com/images/deploy-to-dockercloud.svg)](https://cloud.docker.com/stack/deploy/)
+
+![Docker Stars](https://img.shields.io/docker/stars/aesr/moodle.svg) ![Docker Pulls](https://img.shields.io/docker/pulls/aesr/moodle.svg) ![Docker Automated build](https://img.shields.io/docker/automated/aesr/moodle.svg) ![Docker Build Status](https://img.shields.io/docker/build/aesr/moodle.svg) 
+
+![Issues](https://img.shields.io/github/issues-raw/badges/liyali/moodle-docker.svg) ![Maintenance](https://img.shields.io/maintenance/yes/2017.svg)
+
+### Supported tags and respective `Dockerfile` links
 * [`latest`, `3.3` (3.3/Dockerfile)](https://github.com/liyali/moodle-docker/blob/master/3.x/Dockerfile)
 
-# Quick reference
+### Quick reference
 * **Github:**
 https://github.com/liyali/moodle-docker/issues
 * **Maintained by:**
@@ -9,37 +15,38 @@ Alexandre Esser
 * **Moodle docs:**
 https://docs.moodle.org/
 
+_This image is inspired by the official Wordpress image available on Docker Hub._
 
-
-This image is inspired by the official Wordpress image available on Docker Hub.
-
-## What is Moodle?
+# What is Moodle?
 
 ![Moodle](https://moodle.org/logo/moodle-logo.png "Moodle logo")
 
 Moodle is a learning platform designed to provide educators, administrators and learners with a single robust, secure and integrated system to create personalised learning environments.
 Moodle is built by the Moodle project which is led and coordinated by Moodle HQ, an Australian company of 30 developers which is financially supported by a network of over 60 Moodle Partner service companies worldwide.
 
-## How to use this image?
+# How to use this image?
 
-# Getting started
+## Getting started
 
 First, create a new network for the application and the database:
+
 `$ docker network create moodle`
 
 Then, start a new database process in an isolated container:
+
 `$ docker run --name mysql --network moodle -e MYSQL_ROOT_PASSWORD=password -d mysql`
 
 Finally, you can run this moodle image and link it to your mysql container:
+
 `$ docker run --name my-moodle  --network moodle --link mysql:database -p 8080:80 -d aesr/moodle`
 
 Access it via `http://localhost:8080` or `http://host-ip:8080` in a browser.
 
-# Prerequisites
+## Prerequisites
 
 To run this application you need Docker Engine 1.10+. Docker Compose is recommended with a version 2 or later.
 
-# Environment variables
+## Environment variables
 
 Variable | Default | Description
 --- | --- | ---
@@ -51,7 +58,7 @@ Variable | Default | Description
 *MOODLE_WWW_ROOT* | `''` | **Set the moodle URL**
 *MOODLE_DATA_ROOT* | `'/var/www/moodledata'` | **Path where Moodle can save uploaded files**
 
-## Run the application using `docker-compose`
+# Run the application using `docker-compose`
 
 ```
 # Example docker-compose.yml
@@ -109,12 +116,12 @@ volumes:
       driver: local
 ```
 
-
 In order to get the above `docker-compose.yml` up and running, run the command below:
 
 `$ docker-compose up -d`
 
-# Docker Compose breakdown
+
+## Docker Compose breakdown
 
 Launching this docker compose file will run four isolated service containers: **MySQL, Moodle, PhpMyAdmin and cron**.
 
@@ -137,7 +144,7 @@ In order to run cron, we use the useful [funkyfuture/deck-chores](https://hub.do
       cron.moodle.interval: "every minute"
 ````
 
-## Adding additional libraries / extensions
+# Adding additional libraries / extensions
 
 This image does not provide any additional PHP extensions or other libraries, even if they are required by popular plugins. There are an infinite number of possible plugins, and they potentially require any extension PHP supports. Including every PHP extension that exists would dramatically increase the image size.
 
