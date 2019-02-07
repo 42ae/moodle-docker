@@ -8,6 +8,7 @@ RUN set -ex; \
   \
   apt-get update; \
   apt-get install -y \
+    libzip-dev \
     libicu-dev \
     libpng-dev \
     libxml2-dev \
