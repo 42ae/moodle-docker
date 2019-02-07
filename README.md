@@ -1,5 +1,5 @@
 # Supported tags and respective `Dockerfile` links
-* [`latest`, `3.3` (3.3/Dockerfile)](https://github.com/liyali/moodle-docker/blob/master/3.x/Dockerfile)
+* [`latest`, `3.6` (3.6/Dockerfile)](https://github.com/liyali/moodle-docker/blob/master/3.x/Dockerfile)
 
 # Quick reference
 * **Github:**
