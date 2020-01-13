@@ -35,9 +35,9 @@ RUN a2enmod rewrite expires
 
 VOLUME ["/var/www/html", "/var/www/moodledata"]
 
-ENV MOODLE_BRANCH 36
-ENV MOODLE_RELEASE 3.6.2
-ENV MOODLE_SHA1 12f63e74635077200fffbfae7c60bf3439ce5bdd
+ENV MOODLE_BRANCH 38
+ENV MOODLE_RELEASE 3.8.1
+ENV MOODLE_SHA1 c1830d66a6e64ea466be85292f4b6ded1151324d36536e96b889d36502e6e2f7
 
 RUN set -ex; \
   curl -o moodle.tgz -fSL "https://download.moodle.org/stable${MOODLE_BRANCH}/moodle-${MOODLE_RELEASE}.tgz"; \
