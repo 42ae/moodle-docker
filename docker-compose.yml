@@ -40,7 +40,7 @@ services:
     environment:
       PMA_HOST: database
   tasks:
-    image: funkyfuture/deck-chores
+    image: funkyfuture/deck-chores:1
     restart: unless-stopped
     environment:
       TIMEZONE: Europe/Paris
