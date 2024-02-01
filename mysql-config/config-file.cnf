@@ -1,0 +1,6 @@
+[mysqld]
+
+# Switch back to MySQL 5 authentication
+default_authentication_plugin=mysql_native_password
+
+
