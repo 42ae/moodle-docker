@@ -4,6 +4,8 @@ services:
     image: mysql
     volumes:
       - db_data:/var/lib/mysql
+      # This is needed to allow old PHP versions to work with newer MySQL
+      - ./mysql-config:/etc/mysql/conf.d
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: moodle

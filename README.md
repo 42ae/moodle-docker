@@ -54,13 +54,14 @@ Variable | Default | Description
 ## Run the application using `docker-compose`
 
 ```
-# Example docker-compose.yml
 version: '3'
 services:
   db:
     image: mysql
     volumes:
       - db_data:/var/lib/mysql
+      # This is needed to allow old PHP versions to work with newer MySQL
+      - ./mysql-config:/etc/mysql/conf.d
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: moodle
@@ -97,7 +98,7 @@ services:
     environment:
       PMA_HOST: database
   tasks:
-    image: funkyfuture/deck-chores
+    image: funkyfuture/deck-chores:1
     restart: unless-stopped
     environment:
       TIMEZONE: Europe/Paris
