@@ -35,12 +35,12 @@ RUN a2enmod rewrite expires
 
 VOLUME ["/var/www/html", "/var/www/moodledata"]
 
-ENV MOODLE_BRANCH 38
-ENV MOODLE_RELEASE 3.8.1
-ENV MOODLE_SHA256 c1830d66a6e64ea466be85292f4b6ded1151324d36536e96b889d36502e6e2f7
+ENV MOODLE_BRANCH 311
+ENV MOODLE_RELEASE 3.11.18
+ENV MOODLE_SHA256 31db93742ca4c1b9679070b28bb9f25fb3150d4365dc85a6b04aab0dfafb62a4
 
 RUN set -ex; \
-  curl -o moodle.tgz -fSL "https://download.moodle.org/stable${MOODLE_BRANCH}/moodle-${MOODLE_RELEASE}.tgz"; \
+  curl -o moodle.tgz -fSL "https://packaging.moodle.org/stable${MOODLE_BRANCH}/moodle-${MOODLE_RELEASE}.tgz"; \
   echo "$MOODLE_SHA256 moodle.tgz" | sha256sum -c -; \
 # upstream tarballs include ./moodle/ so this gives us /usr/src/moodle
   tar -xzf moodle.tgz -C /usr/src/; \
