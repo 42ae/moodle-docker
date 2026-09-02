@@ -15,7 +15,7 @@ This image is inspired by the official Wordpress image available on Docker Hub.
 
 ## What is Moodle?
 
-![Moodle](https://moodle.org/logo/moodle-logo.png "Moodle logo")
+![Moodle](assets/moodle-logo.png "Moodle logo")
 
 Moodle is a learning platform designed to provide educators, administrators and learners with a single robust, secure and integrated system to create personalised learning environments.
 Moodle is built by the Moodle project which is led and coordinated by Moodle HQ, an Australian company of 30 developers which is financially supported by a network of over 60 Moodle Partner service companies worldwide.
