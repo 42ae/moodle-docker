@@ -1,0 +1,44 @@
+name: Check Moodle releases
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "41 5 * * 1"
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Compare maintained releases
+        id: releases
+        run: |
+          set +e
+          scripts/check-upstream-releases.sh > release-report.md
+          status=$?
+          set -e
+          cat release-report.md
+          if [ "$status" -eq 1 ]; then
+            echo 'update=true' >> "$GITHUB_OUTPUT"
+          elif [ "$status" -ne 0 ]; then
+            exit "$status"
+          fi
+
+      - name: Open or update maintenance issue
+        if: steps.releases.outputs.update == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          title='New Moodle point release available'
+          issue="$(gh issue list --state open --search "${title} in:title" --json number --jq '.[0].number // empty')"
+          if [ -n "$issue" ]; then
+            gh issue edit "$issue" --title "$title" --body-file release-report.md
+          else
+            gh issue create --title "$title" --body-file release-report.md
+          fi

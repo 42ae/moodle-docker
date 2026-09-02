@@ -1,0 +1,76 @@
+x-moodle-environment: &moodle-environment
+  MOODLE_DB_TYPE: mysqli
+  MOODLE_DB_HOST: db
+  MOODLE_DB_PORT: 3306
+  MOODLE_DB_NAME: ${MOODLE_DB_NAME:-moodle}
+  MOODLE_DB_USER: ${MOODLE_DB_USER:-moodle}
+  MOODLE_DB_PASSWORD: ${MOODLE_DB_PASSWORD:?Set MOODLE_DB_PASSWORD in .env}
+  MOODLE_WWW_ROOT: ${MOODLE_WWW_ROOT:-http://localhost:8080}
+  MOODLE_DATA_ROOT: /var/www/moodledata
+  MOODLE_REVERSE_PROXY: ${MOODLE_REVERSE_PROXY:-false}
+  MOODLE_SSL_PROXY: ${MOODLE_SSL_PROXY:-false}
+
+services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env}
+      MYSQL_DATABASE: ${MOODLE_DB_NAME:-moodle}
+      MYSQL_USER: ${MOODLE_DB_USER:-moodle}
+      MYSQL_PASSWORD: ${MOODLE_DB_PASSWORD:?Set MOODLE_DB_PASSWORD in .env}
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  moodle:
+    image: ${MOODLE_IMAGE:-ghcr.io/42ae/moodle}:${MOODLE_VERSION:-5.2}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${MOODLE_PORT:-8080}:80"
+    environment: *moodle-environment
+    volumes:
+      - moodle_data:/var/www/moodledata
+
+  cron:
+    image: ${MOODLE_IMAGE:-ghcr.io/42ae/moodle}:${MOODLE_VERSION:-5.2}
+    restart: unless-stopped
+    command: ["moodle-cron"]
+    depends_on:
+      db:
+        condition: service_healthy
+      moodle:
+        condition: service_started
+    environment:
+      <<: *moodle-environment
+      MOODLE_CRON_INTERVAL: ${MOODLE_CRON_INTERVAL:-60}
+    volumes:
+      - moodle_data:/var/www/moodledata
+
+  phpmyadmin:
+    image: phpmyadmin:5-apache
+    profiles: ["tools"]
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${PHPMYADMIN_PORT:-8081}:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+
+volumes:
+  db_data:
+  moodle_data:
