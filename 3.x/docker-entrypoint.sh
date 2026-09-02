@@ -53,6 +53,14 @@ if [[ "$1" == apache2* ]]; then
     fi
   done
 
+  : "${MOODLE_DATA_ROOT:=/var/www/moodledata}"
+  # Bind mounts can replace the image directory with a root-owned host path.
+  if [ "$(id -u)" = '0' ]; then
+    mkdir -p "$MOODLE_DATA_ROOT"
+    chown www-data:www-data "$MOODLE_DATA_ROOT"
+    chmod 0750 "$MOODLE_DATA_ROOT"
+  fi
+
   # linking backwards-compatibility
   if [ -n "${!MYSQL_ENV_MYSQL_*}" ]; then
     haveConfig=1
@@ -76,9 +84,6 @@ if [[ "$1" == apache2* ]]; then
     : "${MOODLE_DB_PASSWORD:=}"
     : "${MOODLE_DB_PREFIX:=mdl_}"
     : "${MOODLE_WWW_ROOT:=}"
-    : "${MOODLE_DATA_ROOT:=/var/www/moodledata}"
-
-
     if [ ! -e "config.php" ]; then
       mv config-dist.php config.php
       chown www-data:www-data config.php
