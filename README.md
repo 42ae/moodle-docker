@@ -1,13 +1,15 @@
 # Moodle Docker
 
+[![Latest release](https://img.shields.io/github/v/release/42ae/moodle-docker?label=release)](https://github.com/42ae/moodle-docker/releases/latest)
 [![Docker images](https://github.com/42ae/moodle-docker/actions/workflows/docker.yml/badge.svg)](https://github.com/42ae/moodle-docker/actions/workflows/docker.yml)
+[![Docker pulls](https://img.shields.io/docker/pulls/aesr/moodle)](https://hub.docker.com/r/aesr/moodle)
 
-![Moodle](assets/moodle-logo.png "Moodle logo")
+![Moodle](https://raw.githubusercontent.com/42ae/moodle-docker/master/assets/moodle-logo.png "Moodle logo")
 
 Versioned, multi-architecture Moodle images for local development and self-hosted deployments. Images are published to [GitHub Container Registry](https://github.com/42ae/moodle-docker/pkgs/container/moodle) and [Docker Hub](https://hub.docker.com/r/aesr/moodle).
 
 > [!CAUTION]
-> The `latest` tag now tracks Moodle 5.2, not the historical Moodle 3.x image. Existing installations must pin `3.11` before pulling, or follow the [staged upgrade guide](UPGRADING.md). Never upgrade a production database without a tested backup and plugin-compatibility review.
+> The `latest` tag now tracks Moodle 5.2, not the historical Moodle 3.x image. Existing installations must pin `3.11` before pulling, or follow the [staged upgrade guide](https://github.com/42ae/moodle-docker/blob/master/UPGRADING.md). Never upgrade a production database without a tested backup and plugin-compatibility review.
 
 ## Available versions
 
@@ -47,7 +49,7 @@ docker compose pull
 docker compose up -d
 ```
 
-Supported choices include `3.11`, `4.1`, `4.5`, and `5.2`. Changing the value on an existing installation is an upgrade, not a downgrade or a fresh selection; follow [UPGRADING.md](UPGRADING.md).
+Supported choices include `3.11`, `4.1`, `4.5`, and `5.2`. Changing the value on an existing installation is an upgrade, not a downgrade or a fresh selection; follow the [upgrade guide](https://github.com/42ae/moodle-docker/blob/master/UPGRADING.md).
 
 GitHub Container Registry is the default. To use Docker Hub instead:
 
@@ -84,7 +86,7 @@ Only database data and `moodledata` are persisted by the supplied Compose file:
 - `db_data` stores MySQL files.
 - `moodle_data` stores uploads, caches, and generated application data.
 
-Moodle core remains inside the immutable image. Do not mount a volume over `/var/www/html`; doing so hides the versioned code and makes upgrades difficult to reproduce. Back up both the database and `moodledata`, and test restores regularly. See [UPGRADING.md](UPGRADING.md) for example backup and upgrade commands.
+Moodle core remains inside the immutable image. Do not mount a volume over `/var/www/html`; doing so hides the versioned code and makes upgrades difficult to reproduce. Back up both the database and `moodledata`, and test restores regularly. See the [upgrade guide](https://github.com/42ae/moodle-docker/blob/master/UPGRADING.md) for example backup and upgrade commands.
 
 ## Plugins, themes, and extra PHP extensions
 
@@ -117,7 +119,7 @@ docker compose exec --user www-data moodle php admin/cli/cron.php
 
 ## Build locally
 
-Version metadata and verified upstream SHA-256 values live in [`versions.json`](versions.json). For example:
+Version metadata and verified upstream SHA-256 values live in [`versions.json`](https://github.com/42ae/moodle-docker/blob/master/versions.json). For example:
 
 ```console
 docker build \
