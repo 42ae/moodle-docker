@@ -1,145 +1,139 @@
-# Supported tags and respective `Dockerfile` links
-* [`latest`, `3.11` (3.11/Dockerfile)](https://github.com/liyali/moodle-docker/blob/master/3.x/Dockerfile)
+# Moodle Docker
 
-# Quick reference
-* **Github:**
-https://github.com/liyali/moodle-docker/issues
-* **Maintained by:**
-Alexandre Esser
-* **Moodle docs:**
-https://docs.moodle.org/
+[![Docker images](https://github.com/42ae/moodle-docker/actions/workflows/docker.yml/badge.svg)](https://github.com/42ae/moodle-docker/actions/workflows/docker.yml)
 
+![Moodle](assets/moodle-logo.png "Moodle logo")
 
+Versioned, multi-architecture Moodle images for local development and self-hosted deployments. Images are published to [GitHub Container Registry](https://github.com/42ae/moodle-docker/pkgs/container/moodle) and [Docker Hub](https://hub.docker.com/r/aesr/moodle).
 
-This image is inspired by the official Wordpress image available on Docker Hub.
+> [!CAUTION]
+> The `latest` tag now tracks Moodle 5.2, not the historical Moodle 3.x image. Existing installations must pin `3.11` before pulling, or follow the [staged upgrade guide](UPGRADING.md). Never upgrade a production database without a tested backup and plugin-compatibility review.
 
-## What is Moodle?
+## Available versions
 
-![Moodle](https://moodle.org/logo/moodle-logo.png "Moodle logo")
+| Moodle | PHP | Status | Tags |
+|---|---:|---|---|
+| 3.11.18 | 8.0 | Legacy/EOL; upgrade compatibility only | `3.11.18`, `3.11`, `3`, `legacy-3.11` |
+| 4.1.22 | 8.1 | Legacy/EOL; upgrade bridge only | `4.1.22`, `4.1`, `legacy-4.1` |
+| 4.5.13 | 8.3 | LTS, security fixes | `4.5.13`, `4.5`, `4`, `lts` |
+| 5.2.2 | 8.4 | Current stable | `5.2.2`, `5.2`, `5`, `latest` |
 
-Moodle is a learning platform designed to provide educators, administrators and learners with a single robust, secure and integrated system to create personalised learning environments.
-Moodle is built by the Moodle project which is led and coordinated by Moodle HQ, an Australian company of 30 developers which is financially supported by a network of over 60 Moodle Partner service companies worldwide.
+Use a full version tag for reproducible production deployments. Series tags are convenient but can move to newer point releases after rebuilds.
 
-## How to use this image?
+## Quick start
 
-# Getting started
-
-First, create a new network for the application and the database:
-`$ docker network create moodle`
-
-Then, start a new database process in an isolated container:
-`$ docker run --name mysql --network moodle -e MYSQL_ROOT_PASSWORD=password -d mysql`
-
-Finally, you can run this moodle image and link it to your mysql container:
-`$ docker run --name my-moodle  --network moodle --link mysql:database -p 8080:80 -d aesr/moodle`
-
-Access it via `http://localhost:8080` or `http://host-ip:8080` in a browser.
-
-# Prerequisites
-
-To run this application you need Docker Engine 1.10+. Docker Compose is recommended with a version 2 or later.
-
-# Environment variables
-
-Variable | Default | Description
---- | --- | ---
-*MOODLE_DB_HOST* | `database` an alias on the linked mysql container | **Set the database host**
-*MOODLE_DB_PORT* | `3306` | **Set the database host port**
-*MOODLE_DB_NAME* | `moodle` | **Set the database name**
-*MOODLE_DB_USER* | `root` | **Set the database user**
-*MOODLE_DB_PASSWORD* | `''` or `$MYSQL_ENV_MYSQL_ROOT_PASSWORD` | **Set the database password**
-*MOODLE_WWW_ROOT* | `''` | **Set the moodle URL**
-*MOODLE_DATA_ROOT* | `'/var/www/moodledata'` | **Path where Moodle can save uploaded files**
-
-## Run the application using `docker-compose`
-
-```
-version: '3'
-services:
-  db:
-    image: mysql
-    volumes:
-      - db_data:/var/lib/mysql
-      # This is needed to allow old PHP versions to work with newer MySQL
-      - ./mysql-config:/etc/mysql/conf.d
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: moodle
-      MYSQL_USER: moodle
-      MYSQL_PASSWORD: password
-    restart: always
-  moodle:
-    image: aesr/moodle
-    ports:
-      - "8080:80"
-    links:
-      - db:database
-    volumes:
-      - ./moodledata:/var/www/moodledata
-      - ./moodle:/var/www/html
-    restart: always
-    environment:
-      MOODLE_DB_HOST: database
-      MOODLE_DB_PORT: 3306
-      MOODLE_DB_NAME: moodle
-      MOODLE_DB_USER: moodle
-      MOODLE_DB_PASSWORD: password
-      MOODLE_WWW_ROOT: ${MOODLE_WWW_ROOT:-http://localhost:8080}
-      MOODLE_DATA_ROOT: /var/www/moodledata
-    labels:
-      cron.moodle.command: "/usr/local/bin/php /var/www/html/admin/cli/cron.php"
-      cron.moodle.interval: "every minute"
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    ports:
-      - "8081:80"
-    links:
-      - db:database
-    environment:
-      PMA_HOST: database
-  tasks:
-    image: funkyfuture/deck-chores:1
-    restart: unless-stopped
-    environment:
-      TIMEZONE: Europe/Paris
-      LABEL_NAMESPACE: cron
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-volumes:
-    db_data:
-      driver: local
+```console
+cp .env.example .env
+# Replace every example password in .env before exposing this stack.
+docker compose up -d
 ```
 
+Open <http://localhost:8080>. The first visit starts Moodle's web installer. The Compose stack includes MySQL 8.4 and a separate Moodle cron service; phpMyAdmin is optional:
 
-In order to get the above `docker-compose.yml` up and running, run the command below:
+```console
+docker compose --profile tools up -d
+```
 
-`$ docker-compose up -d`
+### Choose a Moodle version
 
-# Docker Compose breakdown
+Set `MOODLE_VERSION` in `.env`, then pull and start the stack:
 
-Launching this docker compose file will run four isolated service containers: **MySQL, Moodle, PhpMyAdmin and cron**.
+```dotenv
+MOODLE_VERSION=4.5
+```
 
-* __Data Volumes__
-We are mounting two host directories as data volumes to handle moodle data as well as moodle core. MySQL data is mounted as a named volume in order to persist the data.
+```console
+docker compose pull
+docker compose up -d
+```
 
-* __Moodle__
-The image `Dockerfile` is exposing the `port 80` on the container, you can change the port mapping on the host by changing the port variable of the _moodle_ service.
-Refer to the section _Environment variables_ above for more information about moodle environment variables.
+Supported choices include `3.11`, `4.1`, `4.5`, and `5.2`. Changing the value on an existing installation is an upgrade, not a downgrade or a fresh selection; follow [UPGRADING.md](UPGRADING.md).
 
-* __Cron jobs__
+GitHub Container Registry is the default. To use Docker Hub instead:
 
-The Moodle `cron` process is a PHP script (part of the standard Moodle installation) that must be run regularly in the background. The Moodle cron script runs different tasks at differently scheduled intervals.
+```dotenv
+MOODLE_IMAGE=aesr/moodle
+```
 
-In order to run cron, we use the useful [funkyfuture/deck-chores](https://hub.docker.com/r/funkyfuture/deck-chores/) image which allows us to define regular cron jobs to run within a container context via container labels.
+## Configuration
 
-````
-    labels:
-      cron.moodle.command: "/usr/local/bin/php /var/www/html/admin/cli/cron.php"
-      cron.moodle.interval: "every minute"
-````
+The image supports the following environment variables. If any Moodle configuration variable is provided and `config.php` is absent, the entrypoint creates a minimal cross-version configuration file.
 
-## Adding additional libraries / extensions
+| Variable | Default | Purpose |
+|---|---|---|
+| `MOODLE_DB_HOST` | `database` | MySQL/MariaDB hostname |
+| `MOODLE_DB_PORT` | `3306` | Database port |
+| `MOODLE_DB_NAME` | `moodle` | Database name |
+| `MOODLE_DB_USER` | `moodle` | Database user |
+| `MOODLE_DB_PASSWORD` | empty | Database password |
+| `MOODLE_DB_PREFIX` | `mdl_` | Table prefix |
+| `MOODLE_WWW_ROOT` | `http://localhost:8080` | Public Moodle URL |
+| `MOODLE_DATA_ROOT` | `/var/www/moodledata` | Private writable data directory |
+| `MOODLE_REVERSE_PROXY` | `false` | Trust a reverse proxy |
+| `MOODLE_SSL_PROXY` | `false` | TLS terminates at a trusted proxy |
+| `MOODLE_CRON_INTERVAL` | `60` | Cron-sidecar interval in seconds |
 
-This image does not provide any additional PHP extensions or other libraries, even if they are required by popular plugins. There are an infinite number of possible plugins, and they potentially require any extension PHP supports. Including every PHP extension that exists would dramatically increase the image size.
+Every variable also accepts Docker secret syntax through a matching `_FILE` variable, such as `MOODLE_DB_PASSWORD_FILE=/run/secrets/moodle_db_password`. Do not set both forms for the same variable.
 
-If you need additional PHP extensions, you'll need to create your own image using `FROM aesr/moodle`. The [documentation of the php image](https://github.com/docker-library/docs/blob/master/php/README.md#how-to-install-more-php-extensions) explains how to compile additional extensions.
+The entrypoint configures Moodle; it deliberately does not create databases. Provision the database separately or use the included Compose stack.
+
+## Persistence and backups
+
+Only database data and `moodledata` are persisted by the supplied Compose file:
+
+- `db_data` stores MySQL files.
+- `moodle_data` stores uploads, caches, and generated application data.
+
+Moodle core remains inside the immutable image. Do not mount a volume over `/var/www/html`; doing so hides the versioned code and makes upgrades difficult to reproduce. Back up both the database and `moodledata`, and test restores regularly. See [UPGRADING.md](UPGRADING.md) for example backup and upgrade commands.
+
+## Plugins, themes, and extra PHP extensions
+
+For repeatable deployments, build a derived image and pin its base to a full version:
+
+```dockerfile
+FROM ghcr.io/42ae/moodle:5.2.2
+
+COPY --chown=www-data:www-data local/myplugin/ /var/www/html/local/myplugin/
+COPY --chown=www-data:www-data theme/mytheme/ /var/www/html/theme/mytheme/
+```
+
+Targeted read-only mounts can be useful for local development, but a derived image is safer for production. Install additional PHP extensions in the derived image when a plugin requires them.
+
+## Operations
+
+Run a one-off Moodle CLI command with the web service:
+
+```console
+docker compose exec --user www-data moodle php admin/cli/maintenance.php --enable
+docker compose exec --user www-data moodle php admin/cli/upgrade.php --non-interactive
+docker compose exec --user www-data moodle php admin/cli/maintenance.php --disable
+```
+
+The `cron` service runs `admin/cli/cron.php` continuously at `MOODLE_CRON_INTERVAL`. To run cron once:
+
+```console
+docker compose exec --user www-data moodle php admin/cli/cron.php
+```
+
+## Build locally
+
+Version metadata and verified upstream SHA-256 values live in [`versions.json`](versions.json). For example:
+
+```console
+docker build \
+  --build-arg MOODLE_VERSION=5.2.2 \
+  --build-arg PHP_VERSION=8.4 \
+  --build-arg MOODLE_BRANCH=502 \
+  --build-arg MOODLE_SHA256=72be209e7c0f5341b87de0bc993b2430087fda2769d8c3cc2f32736d1513e88c \
+  --build-arg APACHE_DOCUMENT_ROOT=/var/www/html/public \
+  -t moodle:local .
+```
+
+## Security and support
+
+- Moodle 3.11 and 4.1 are unsupported upstream and are published only for compatibility and staged upgrades.
+- Prefer the supported 4.5 LTS or current 5.2 series for new deployments.
+- Terminate TLS at a trusted proxy, keep the database off public networks, use secrets instead of committed passwords, and restrict access to `moodledata`.
+- Review [Moodle security announcements](https://moodle.org/security/) and rebuild derived images regularly.
+
+Issues and contributions are welcome in the [42ae/moodle-docker repository](https://github.com/42ae/moodle-docker).

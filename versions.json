@@ -1,0 +1,44 @@
+{
+  "versions": [
+    {
+      "moodle": "3.11.18",
+      "series": "3.11",
+      "php": "8.0",
+      "branch": "311",
+      "sha256": "31db93742ca4c1b9679070b28bb9f25fb3150d4365dc85a6b04aab0dfafb62a4",
+      "document_root": "/var/www/html",
+      "support": "legacy",
+      "tags": ["3.11.18", "3.11", "3", "legacy-3.11"]
+    },
+    {
+      "moodle": "4.1.22",
+      "series": "4.1",
+      "php": "8.1",
+      "branch": "401",
+      "sha256": "0a340a42b4b982973ed60c3ebc8e19bc13ee7426ba4dcc6e1d2a79a01fb8a691",
+      "document_root": "/var/www/html",
+      "support": "upgrade-only",
+      "tags": ["4.1.22", "4.1", "legacy-4.1"]
+    },
+    {
+      "moodle": "4.5.13",
+      "series": "4.5",
+      "php": "8.3",
+      "branch": "405",
+      "sha256": "1619871a0883bad03081f8ace0998d4edf06b8fd2b4b73196aafc6415a181d01",
+      "document_root": "/var/www/html",
+      "support": "lts-security",
+      "tags": ["4.5.13", "4.5", "4", "lts"]
+    },
+    {
+      "moodle": "5.2.2",
+      "series": "5.2",
+      "php": "8.4",
+      "branch": "502",
+      "sha256": "72be209e7c0f5341b87de0bc993b2430087fda2769d8c3cc2f32736d1513e88c",
+      "document_root": "/var/www/html/public",
+      "support": "stable",
+      "tags": ["5.2.2", "5.2", "5", "latest"]
+    }
+  ]
+}
