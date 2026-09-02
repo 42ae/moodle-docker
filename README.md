@@ -1,9 +1,9 @@
 # Supported tags and respective `Dockerfile` links
-* [`latest`, `3.11` (3.11/Dockerfile)](https://github.com/liyali/moodle-docker/blob/master/3.x/Dockerfile)
+* [`latest`, `3.11` (3.11/Dockerfile)](https://github.com/42ae/moodle-docker/blob/master/3.x/Dockerfile)
 
 # Quick reference
 * **Github:**
-https://github.com/liyali/moodle-docker/issues
+https://github.com/42ae/moodle-docker/issues
 * **Maintained by:**
 Alexandre Esser
 * **Moodle docs:**
